@@ -1,0 +1,19 @@
+#####
+#contents:
+#  - common_path: 'F:/raw_data/' : This is our common path folder.
+#  - raw_data_dir: 'raw_data' : subdirectory path of our raw data input.
+#  - series_dir: 'output/series' :subdirectory path of processed series data.
+#  - spectrogram_dir: 'output/20190609_vanilla/trackings' : subdirectory path
+#    of spectogram
+#  - training_dir: 'output/20190609_vanilla/trackings' : subdirectory path of
+#    our training data
+#  - model_out_dir: This subdirectory will save models.
+
+#####
+contents:
+  common_path: ''
+  raw_data_dir: ''
+  series_dir: ''
+  spectrogram_dir: ''
+  training_dir: ''
+  model_out_dir: ''
