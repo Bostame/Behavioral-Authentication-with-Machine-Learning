@@ -31,15 +31,16 @@ class ReadConfig:
     def parse_file_path(self):
         content_dict = self.read_data_path()
         file_path = FilePath()
-        file_path.common_path = content_dict['common_path']
-        file_path.raw_data_dir = file_path.common_path + content_dict[
-            'raw_data_dir']
-        file_path.series_dir = file_path.common_path + content_dict[
-            'series_dir']
-        file_path.spectrogram_dir = file_path.common_path + content_dict[
-            'spectrogram_dir']
-        file_path.training_dir = file_path.common_path + content_dict[
-            'training_dir']
+        file_path.raw_data = content_dict['raw_data']
+        file_path.output_path = content_dict['output_path']
+        file_path.test_name = content_dict['test_name']
+        file_path.output_path = file_path.output_path + "/" + file_path.test_name
+        file_path.series_dir = file_path.output_path + "/series"
+        file_path.spectrogram_dir = file_path.output_path + "/spectrogram"
+        file_path.threeChannelSpectrogram = file_path.output_path + \
+                                            "/3CTrackings"
+        file_path.training_dir = file_path.output_path + "/training"
+        file_path.model_dir = file_path.output_path + "/model"
         return file_path
 
 
