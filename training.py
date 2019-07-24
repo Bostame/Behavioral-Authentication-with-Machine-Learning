@@ -3,7 +3,7 @@ import os
 import numpy as np
 import tensorflow as tf
 
-from lib.cnn.small_sence_v4 import _sence_net
+from lib.cnn.small_sence_v7 import _sence_net
 from lib.data_loader.data_loader import _CNN_Data_Loader
 from lib.network_util.config import ConfigReader, TrainNetConfig, DataConfig
 from utils.read_config import ReadConfig
@@ -71,7 +71,7 @@ def train(conf_path, out_dir):
                 feed_dict={net.x: train_image, net.y: train_label})
             if step % 50 == 0 or step + 1 == train_config.max_step:
                 print('===TRAIN===: Step: %d, loss: %.4f, accuracy: %.4f%%' % (
-                step, train_loss, train_acc))
+                    step, train_loss, train_acc))
                 summary_str = sess.run(summary_op,
                                        feed_dict={net.x: train_image,
                                                   net.y: train_label})
@@ -86,7 +86,7 @@ def train(conf_path, out_dir):
                     feed_dict={net.x: val_image, net.y: val_label})
                 print(
                     '====VAL====: Step %d, val loss = %.4f, val accuracy = %.4f%%' % (
-                    step, val_loss, val_acc))
+                        step, val_loss, val_acc))
                 summary_str = sess.run(summary_op, feed_dict={net.x: val_image,
                                                               net.y: val_label})
                 val_summary_writer.add_summary(summary_str, step)
@@ -101,36 +101,17 @@ def train(conf_path, out_dir):
     sess.close()
 
 
-def _train20190622_debug():
-    rc = ReadConfig()
-    path = rc.read_data_path()
-    conf_path = rc.read_experiment_1_path()
-    out_dir = path['common_path'] + path['model_out_dir']
-    train(conf_path, out_dir)
-    return None
-
-
-def _train20190711_3channel():
-    rc = ReadConfig()
-    path = rc.read_data_path()
-    conf_path = rc.read_experiment_2_path()
-    out_dir = path['common_path'] + path['model_out_dir']
-    train(conf_path, out_dir)
-    return None
-
-
-def _train20190712_3channel_acgy_10_classes():
-    rc = ReadConfig()
-    path = rc.read_data_path()
-    conf_path = rc.read_experiment_2_path()
-    out_dir = path['common_path'] + path['model_out_dir']
-    train(conf_path, out_dir)
+def three_channel_acgy_10_classes_longer(expr_path, out_dir):
+    train(expr_path, out_dir)
     return None
 
 
 def main():
-    # _train20190711_3channel()
-    _train20190712_3channel_acgy_10_classes()
+    rc = ReadConfig()
+    path = rc.parse_file_path()
+    expr_path = rc.read_experiment_3_path()
+    out_dir = path.model_dir
+    three_channel_acgy_10_classes_longer(expr_path, out_dir)
 
 
 if __name__ == '__main__':

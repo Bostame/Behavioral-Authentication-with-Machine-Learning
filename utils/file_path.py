@@ -9,3 +9,4 @@ class FilePath:
         self.threeChannelSpectrogram = ""
         self.training_dir = ""
         self.model_dir = ""
+        self.train_test_split: bool = False

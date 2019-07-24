@@ -6,9 +6,13 @@
 #                 be saved. e.g series,spectrogram's,training
 #  - test_name: 'schokolade' : Any arbitrary name which will be used to
 #               create sub directory.
+#  - train_test_split: True/False : It's a boolean value If we set it true then
+#                      tfrecord will generate based on 70/30 split otherwise
+#                      not.
 
 #####
 contents:
   raw_data: ''
   output_path: ''
   test_name: ''
+  train_test_split: True

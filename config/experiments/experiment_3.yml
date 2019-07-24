@@ -1,0 +1,24 @@
+TRAIN:
+  MODE: 'TRAIN'
+  NAME: '20190714_training_10classes_small_v7_lr1e-5_Adam_Longer_with_split'
+  CHECKPOINT_DIR: ''
+  MAX_TO_KEEP: 1000
+  LEARNING_RATE: 0.0005
+  MAX_STEP: 10000
+  IS_PRETRAIN: True
+  OPTIMIZER: 'Adam'
+  WEIGHT_DECAY: 0.3
+  PRE_TRAIN_WEIGHT:
+
+TEST:
+
+DATA:
+  N_CLASSES: 10
+  BATCH_SIZE: 128
+  IMAGE_SIZE:
+    WIDTH: 50
+    HEIGHT: 100
+    DEPTH: 3
+  DATA_DIR: ''
+  IS_SHUFFLE: True
+  NORMALIZE: False

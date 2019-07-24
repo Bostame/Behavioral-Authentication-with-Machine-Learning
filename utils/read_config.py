@@ -20,6 +20,12 @@ class ReadConfig:
         path = "{0}{1}".format(ROOT_DIR, '/config/experiments/experiment_2.yml')
         return path
 
+    def read_experiment_3_path(self):
+        ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
+        ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, os.pardir))
+        path = "{0}{1}".format(ROOT_DIR, '/config/experiments/experiment_3.yml')
+        return path
+
     def read_data_path(self):
         ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
         ROOT_DIR = os.path.abspath(os.path.join(ROOT_DIR, os.pardir))
@@ -41,6 +47,7 @@ class ReadConfig:
                                             "/3CTrackings"
         file_path.training_dir = file_path.output_path + "/training"
         file_path.model_dir = file_path.output_path + "/model"
+        file_path.train_test_split = content_dict['train_test_split']
         return file_path
 
 
