@@ -66,7 +66,9 @@ class ProcessData():
             meta['timestamp'] = re.split('__|\.\s*', os.path.basename(fn))[1]
             #
             raw_data = util.slurpjson(fn)
-            inner_dict = [values for keys, values in raw_data[0].items()]
+            if not raw_data:
+                continue
+            inner_dict = [values for keys, values in sorted(raw_data[0].items())]
             # These are the records
             sensorEventBatch = inner_dict[2]
             # all sensor types
