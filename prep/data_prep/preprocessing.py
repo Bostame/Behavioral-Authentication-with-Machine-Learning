@@ -151,33 +151,34 @@ class SpectrogramGeneration():
         counter = 0
         for idx, fn in enumerate(filenames):
             track = util.load1(fn)
-            windows = list(set([ex['window'] for ex in track]))
-            track_meta = {
-                'label': list(set([ex['label'] for ex in track]))[0],
-                'coordinates': list(set([ex['coordinate'] for ex in track])),
-                'person': list(set([ex['person'] for ex in track]))[0],
-                'sensor': int(re.split('_|.pz', os.path.basename(fn))[-2])
-            }
-            examples_list = []
-            for w in windows:
-                window_image_meta = copy.deepcopy(track_meta)
-                data_one_window = [ex['image'] for ex in track if
-                                   ex['window'] == w]
-                reshaping = [(lambda x: x.reshape(spectrogram_dim[0],
-                                                  spectrogram_dim[1], 1))(e) for
-                             e in data_one_window]
-                new_img = np.concatenate(
-                    (reshaping[0], reshaping[1], reshaping[2]),
-                    axis=2)
-                window_image_meta['image'] = new_img
-                examples_list.append(window_image_meta)
-            counter += len(examples_list)  # just for info purposes
-            suffix = "{}_{}-sensor_{}.pz".format(idx, track_meta['label'],
-                                                 track_meta['sensor'])
-            out_fn = os.path.join(out_dir,
-                                  '{}_ex_{}'.format(track_meta['person'],
-                                                    suffix))
-            util.save1(out_fn, examples_list)
+            if track:
+                windows = list(set([ex['window'] for ex in track]))
+                track_meta = {
+                    'label': list(set([ex['label'] for ex in track]))[0],
+                    'coordinates': list(set([ex['coordinate'] for ex in track])),
+                    'person': list(set([ex['person'] for ex in track]))[0],
+                    'sensor': int(re.split('_|.pz', os.path.basename(fn))[-2])
+                }
+                examples_list = []
+                for w in windows:
+                    window_image_meta = copy.deepcopy(track_meta)
+                    data_one_window = [ex['image'] for ex in track if
+                                       ex['window'] == w]
+                    reshaping = [(lambda x: x.reshape(spectrogram_dim[0],
+                                                      spectrogram_dim[1], 1))(e) for
+                                 e in data_one_window]
+                    new_img = np.concatenate(
+                        (reshaping[0], reshaping[1], reshaping[2]),
+                        axis=2)
+                    window_image_meta['image'] = new_img
+                    examples_list.append(window_image_meta)
+                counter += len(examples_list)  # just for info purposes
+                suffix = "{}_{}-sensor_{}.pz".format(idx, track_meta['label'],
+                                                     track_meta['sensor'])
+                out_fn = os.path.join(out_dir,
+                                      '{}_ex_{}'.format(track_meta['person'],
+                                                        suffix))
+                util.save1(out_fn, examples_list)
         print('Number of generated spectrograms is : {}'.format(counter))
         return None
 

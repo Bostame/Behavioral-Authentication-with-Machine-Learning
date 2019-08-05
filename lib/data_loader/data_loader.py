@@ -27,6 +27,10 @@ class _CNN_Data_Loader(DataLoader):
         self.n_classes = self.config.n_classes
         self.normalize = self.config.normalize
 
+    def _normalization(self, tensor):
+        tensor = tf.div(tf.subtract(tensor, tf.reduce_min(tensor)), tf.subtract(tf.reduce_max(tensor), tf.reduce_min(tensor)))
+        return tensor
+
     def _parse_record(self, tf_record):
         features = {
             'height': tf.FixedLenFeature([], tf.int64),
@@ -44,12 +48,9 @@ class _CNN_Data_Loader(DataLoader):
         #
         label = tf.cast(record['label'], tf.int32)
         label = tf.one_hot(label, depth=self.n_classes)
+        if self.normalize:
+            image_raw = self._normalization(image_raw)
         return image_raw, label
-
-    #    def _data_normalization(self, tensor_in, epsilon=.0001):
-    #        mean, variance = tf.nn.moments(tensor_in, axes=[0])
-    #        tensor_normalized = (tensor_in - mean) / (variance + epsilon)
-    #        return tensor_normalized
 
     def _generate_batch(self):
         if self.training_mode is True:
@@ -68,9 +69,6 @@ class _CNN_Data_Loader(DataLoader):
         dataset = dataset.repeat()
         dataset = dataset.batch(self.batch_size, drop_remainder=True)
         #
-        #        if self.normalize:
-        #            dataset = dataset.map(self._data_normalization)
-
         iterator = dataset.make_one_shot_iterator()
         features, labels = iterator.get_next()
         return features, labels
@@ -84,9 +82,6 @@ class _CNN_Data_Loader(DataLoader):
         #
         dataset = dataset.repeat(1)
         dataset = dataset.batch(self.batch_size, drop_remainder=True)
-        #
-        #        if self.normalize:
-        #            dataset = dataset.map(self._data_normalization)
 
         iterator = dataset.make_one_shot_iterator()
         features, labels = iterator.get_next()

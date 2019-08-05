@@ -11,10 +11,14 @@ import numpy as np
 from tqdm import tqdm
 
 from utils import util
+from utils.activity_type import activity_action
 from utils.read_config import ReadConfig
 
 
 class ProcessData():
+
+    def __init__(self):
+        self.user_info_context = ""
 
     def detect_activities_person(self, data_path):
         if str(data_path).endswith('/'):
@@ -23,6 +27,10 @@ class ProcessData():
         filenames = glob.glob('{}/*'.format(data_path))
         file_acivities = []
         for fn in filenames:
+
+            if "User information_context" in fn:
+                self.user_info_context = util.slurpjson(fn)
+                continue
             if util.is_file_in_filtered_criteria(fn):
                 continue
 
@@ -31,14 +39,45 @@ class ProcessData():
             file_acivities.append(activity)
         return list(set(file_acivities))
 
-    def process_sensor_data(self, meta, sensorEventBatch, sensor_type):
+    def getActualActivityTimestamp(self, activity):
+        startTime = 0
+        stopTime = 0
+
+        if activity_action[activity] == 'location':
+            startKey = 'signal_start_of_experiment_to_user'
+        else:
+            startKey = 'show_user_task_ui_after_unlock_detected'
+
+        # 'walking_normal' prefix added because in user_information_context
+        #  data it holds activity with this prefix.
+        activity = 'walking_normal_' + activity
+        for d in self.user_info_context:
+            if d[
+                'experimentIdentifier'] == activity:
+                eventList = d['experimentEvents']
+                for event in eventList:
+                    if event['eventAction'] == startKey:
+                        startTime = event['systemTimeStampInMillis']
+
+                    if event[
+                        'eventAction'] == 'signal_stop_of_experiment_to_user':
+                        stopTime = event['systemTimeStampInMillis']
+
+                break
+
+        return startTime, stopTime
+
+    def process_sensor_data(self, meta, activity, sensorEventBatch,
+                            sensor_type):
+        startTime, stopTime = self.getActualActivityTimestamp(activity)
         sensor_data = \
             [ex for ex in sensorEventBatch if ex["sensorType"] == sensor_type][
                 0]
         records = sensor_data['sensorEventRecords']
         series = np.empty((0, len(records[0]['values'])))
         for ex in records:
-            series = np.vstack((series, np.array(ex['values'])))
+            if startTime <= ex['systemTimestamp'] <= stopTime:
+                series = np.vstack((series, np.array(ex['values'])))
         meta['series'] = series
         return meta
 
@@ -47,6 +86,19 @@ class ProcessData():
             path = path[:-1]
         #
         filenames = glob.glob('{}/*{}*'.format(path, activity))
+
+        # Need to filter our landscape_texting_activity because when we
+        #  take texting_activity_step then landscape files added into the
+        # list too.
+        if activity == "texting_activity_step":
+            file_list = []
+            for fn in filenames:
+                if "landscape_texting_activity_step" in fn:
+                    continue
+                else:
+                    file_list.append(fn)
+
+            filenames = file_list
         user = os.path.basename(path).split('_')[0]
         #
         single_register = []
@@ -75,8 +127,8 @@ class ProcessData():
             sensors_stacks = []
             for sensor in all_sensors:
                 meta['sensor'] = sensor
-                sensor_dict = self.process_sensor_data(meta, sensorEventBatch,
-                                                       sensor)
+                sensor_dict = self.process_sensor_data(meta, activity,
+                                                       sensorEventBatch, sensor)
                 sensors_stacks.append(sensor_dict.copy())
             #
             single_register.extend(sensors_stacks)
